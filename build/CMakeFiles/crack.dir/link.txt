@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/crack.dir/link.d CMakeFiles/crack.dir/src/main.cpp.o -o crack
