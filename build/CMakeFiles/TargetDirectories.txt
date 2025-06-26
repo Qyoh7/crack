@@ -1,0 +1,3 @@
+/home/zayden/personal/projects/crackpiler/build/CMakeFiles/crack.dir
+/home/zayden/personal/projects/crackpiler/build/CMakeFiles/edit_cache.dir
+/home/zayden/personal/projects/crackpiler/build/CMakeFiles/rebuild_cache.dir
