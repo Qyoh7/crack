@@ -24,8 +24,9 @@ class Parser
 
         [[nodiscard]] std::optional<Token> peek(int ahead = 0) const
         {
-            if (m_index + ahead > m_tokens.size())
+            if (m_index + ahead >= m_tokens.size())
             {
+                std::cout << "tried to peek out of bounds, returning null" << std::endl;
                 return {};
             }
             return m_tokens.at(m_index + ahead);
@@ -44,8 +45,7 @@ class Parser
 
         std::optional<NodeExpr> parse_expr()
         {
-            auto next = peek();
-            if (next.has_value() && next.value().type == TokenType::int_lit)
+            if (peek().has_value() && peek().value().type == TokenType::int_lit)
             {
                 return NodeExpr
                 {

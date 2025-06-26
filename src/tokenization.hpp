@@ -30,7 +30,7 @@ class Tokenizer
         size_t m_index = 0;
         [[nodiscard]] inline std::optional<char> peek(int ahead = 1) const
         {
-            if (m_index + ahead > m_src.length())
+            if (m_index + ahead >= m_src.length())
             {
                 return {};
             }
