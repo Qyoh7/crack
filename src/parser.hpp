@@ -26,7 +26,6 @@ class Parser
         {
             if (m_index + ahead >= m_tokens.size())
             {
-                std::cout << "tried to peek out of bounds, returning null" << std::endl;
                 return {};
             }
             return m_tokens.at(m_index + ahead);
