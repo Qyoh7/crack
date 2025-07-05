@@ -3,17 +3,49 @@
 #include <cstddef>
 #include <cstdlib>
 #include <vector>
+#include <variant>
 
 #include "tokenization.hpp"
 
-struct NodeExpr
+struct NodeExprIntLit
 {
     Token int_lit;
 };
 
+struct NodeExprIdent
+{
+    Token ident;
+};
+
+struct NodeExpr
+{
+    std::variant<NodeExprIntLit, NodeExprIdent> var;
+};
+
 struct NodeExit
 {
+    std::variant<NodeExprIntLit, NodeExprIdent> var;
+};
+
+struct NodeStmtExit
+{
     NodeExpr expr;
+};
+
+struct NodeStmtLet
+{
+    Token ident;
+    NodeExpr expr;
+};
+
+struct NodeStmt
+{
+    std::variant<NodeStmtExit, NodeStmtLet> var;
+};
+
+struct NodeProg
+{
+    std::vector<NodeStmt> stmts;
 };
 
 
@@ -22,13 +54,13 @@ class Parser
         const std::vector<Token> m_tokens;
         size_t m_index = 0;
 
-        [[nodiscard]] std::optional<Token> peek(int ahead = 0) const
+        [[nodiscard]] std::optional<Token> peek(int offset = 0) const
         {
-            if (m_index + ahead >= m_tokens.size())
+            if (m_index + offset >= m_tokens.size())
             {
                 return {};
             }
-            return m_tokens.at(m_index + ahead);
+            return m_tokens.at(m_index + offset);
         }
         Token consume()
         {
@@ -46,10 +78,11 @@ class Parser
         {
             if (peek().has_value() && peek().value().type == TokenType::int_lit)
             {
-                return NodeExpr
-                {
-                    .int_lit = consume()
-                };
+                return NodeExpr { .var = NodeExprIntLit {.int_lit = consume()} };
+            }
+            else if (peek().has_value() && peek().value().type == TokenType::ident)
+            {
+                return NodeExpr {.var = NodeExprIdent {.ident = consume()}};
             }
             return {};
         }
@@ -59,8 +92,9 @@ class Parser
             std::optional<NodeExit> exit_node;
             while (peek().has_value())
             {
-                if (peek().value().type == TokenType::exit)
+                if (peek().value().type == TokenType::exit && peek(1).has_value() && peek(1).value().type == TokenType::open_paren)
                 {
+                    consume();
                     consume();
                     if (auto node_expr = parse_expr())
                     {
@@ -70,12 +104,21 @@ class Parser
                         std::cerr << "Invalid Expression" << std::endl;
                         exit(EXIT_FAILURE);
                     }
+                    if (peek().has_value() && peek().value().type == TokenType::close_paren)
+                    {
+                        consume();
+                    }
+                    else
+                    {
+                        std::cerr << "Expected `)`" << std::endl;
+                        exit(EXIT_FAILURE);
+                    }
                     if (peek().has_value() && peek().value().type == TokenType::semi)
                     {
                         consume();
                     }
                     else {
-                        std::cerr << "Invalid Expression" << std::endl;
+                        std::cerr << "Expected `;`" << std::endl;
                         exit(EXIT_FAILURE);
                     }
                 }
