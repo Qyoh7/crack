@@ -1,5 +1,6 @@
 #pragma once
 
+#include "parser.hpp"
 #include <cctype>
 #include <cstdlib>
 #include <string> 
@@ -17,7 +18,9 @@ enum class TokenType
     semi,
     open_paren,
     close_paren,
-    ident
+    ident,
+    let,
+    eq
 };
 
 struct Token
@@ -69,6 +72,11 @@ class Tokenizer
                         tokens.push_back({.type = TokenType::exit});
                         buf.clear();
                     }
+                    if (buf == "let")
+                    {
+                        tokens.push_back({.type = TokenType::let});
+                        buf.clear();
+                    }
                     else
                     {
                         tokens.push_back({.type = TokenType::ident, .value = buf});
@@ -99,7 +107,11 @@ class Tokenizer
                 {
                     consume();
                     tokens.push_back({.type = TokenType::semi});
-
+                }
+                else if (peek().value() == '=')
+                {
+                    consume();
+                    tokens.push_back({.type = TokenType::eq});
                 }
                 else if (std::isspace(peek().value()))
                 {
