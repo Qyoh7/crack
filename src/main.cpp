@@ -12,20 +12,18 @@ const char TAB = '\t';
 // Variable Declarations
 
 char look;
-                              
+
 // Read New Character From Input Stream
-void GetChar()
+void getChar()
 {
-    cin.get(look);
+   cin.get(look);
 }
 
 // Report an Error
-
 void error(string s)
 {
-    cout << "Error" << s << "\n";
+   cout << "Error " << s << "\n";
 }
-
 
 // Report Error and Halt
 void abort(string s)
@@ -43,48 +41,82 @@ void expected(string s)
 // Match a Specific Input Character
 void match(char x)
 {
-   if (look == x) getchar();
-   else expected(std::to_string(x));
+   if (look == x)
+      getChar();
+   else
+      expected(std::to_string(x));
 }
 
 // get an identifier
 char GetName()
 {
-    char name;
-    if (!std::isalpha(look)) expected("Name");
-    name = toupper(look);
-    getchar();
-    return name;
+   char name;
+   if (!std::isalpha(look))
+      expected("Name");
+   name = toupper(look);
+   getChar();
+   return name;
 }
-
 
 // Get a Number
 char GetNum()
 {
-    char num;
-   if (std::isdigit(look)) expected("Integer");
-   num = look;
-   getchar();
+   char num = look;
+   if (!std::isdigit(look))
+      expected("Integer");
+   getChar();
    return num;
 }
 
-
 // Output a String with Tab
-
 void Emit(string s)
 {
    cout << TAB << s;
 }
 
 // Initialize
-void init() 
+void init()
 {
-    getchar();
+   getChar();
+}
+
+void parseTerm()
+{
+   cout << "MOVE #" << GetNum() << ",D0\n";
+}
+
+void add()
+{
+   match('+');
+   parseTerm();
+   cout << "ADD D1, D0\n";
+}
+
+void subtract()
+{
+   match('-');
+   parseTerm();
+   cout << "SUB D1,D0\n";
+}
+
+void parseExpr()
+{
+   parseTerm();
+   switch (look)
+   {
+      case '+':
+         add();
+      case '-':
+         subtract();
+      default:
+         expected("Addop");
+   }
 }
 
 // Main Program
 int main()
 {
-    init();
-    return 0;
+   init();
+   parseExpr();
+   return 0;
 }
